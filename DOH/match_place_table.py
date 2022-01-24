@@ -1,10 +1,12 @@
 import pandas as pd
 
-#   This file reads a pdf-to-excel file of the FHSIS and writes the corresponding
-#   values according to the place name. Works only for one (1) table.
+#   This file reads a pdf-to-excel file of the FHSIS and writes the
+#   corresponding values according to the place name. Works only for
+#   one (1) table.
 
 #   Filename of pdf-to-excel file.
 datafilename = "datafile_input.xlsx"
+outfilename = "output.xlsx"
 
 #   Loading entire place_table into a DataFrame.
 #   Add new columns for variables/indicators then write to an out file.
@@ -15,20 +17,13 @@ output_table = pd.read_excel("place_table.xlsx", "Sheet1")
 data_table = pd.read_excel(datafilename, "Table 1")
 
 #   Selecting "province" rows, because province name repeats in place_table.
-#   Will do the same with HUCs, etc. Set index to province name and use update().
-#   Store copy of original index.
+#   Will do the same with HUCs, etc. Set index to province name and
+#   use join(). Store copy of original index and restore later to merge
+#   with output_table.
 prov_df = output_table.loc[output_table['CATEGORY'] == 'Province']
 temp_df = pd.DataFrame(index=prov_df.index.copy())
-prov_df.set_index('Province', inplace=True)
+#prov_df = prov_df.set_index('Province').join(data_table.set_index('AREA'))
 
-print(prov_df.index)
+[data_table[place == prov_df['Province']] for place in data_table['AREA']]
 
-prov_df.index = temp_df.index
-
-print(prov_df.index)
-
-
-#with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-#    print(temp_df.index)
-
-#data_table.set_index('AREA')
+#prov_df.to_excel(outfilename)

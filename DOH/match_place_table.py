@@ -1,4 +1,3 @@
-from msilib.schema import ODBCSourceAttribute
 import pandas as pd
 import numpy as np
 
@@ -23,6 +22,8 @@ rename_dict = {
 }
 
 #   Flag province names that have same name as local name.
+#   Not needed for now? Because FHSIS does not report on municipalities
+#   with province-similar name. No conflict with HUC/ICC names.
 samename = [
     'ISABELA',
     'QUIRINO',
@@ -40,32 +41,29 @@ place_table = pd.read_excel("place_table.xlsx", "Sheet1")
 place_table['ALT_LOCAL'] = place_table['ALT_LOCAL'].str.upper()
 
 #   Loading entire data file (pdf-to-excel file of FHSIS) into a DataFrame.
-#   Match row place name to place_table (place_table) then add data.
+#   Removing blank rows. Replacing some names to match place_table names.
 data_table = pd.read_excel(datafilename, "Table 1")
 data_table = data_table[data_table['AREA'].str.len() > 0]
 data_table.replace(rename_dict, inplace=True)
 
-#   Selecting "province" rows, because province name repeats in place_table.
-#   Will do the same with HUCs, etc. Set index to province name and
-#   use join(). Store copy of original index and restore later to merge
-#   with place_table.
+#   Cannot immediately match data_table to place_table because
+#   province names repeat. Pick out province rows in place_table
+#   then combine separately. Do same for HUC, ICC, and Region for convenience.
 prov_df = place_table[place_table['CATEGORY'] == 'Province']
 prov_df = prov_df.join(data_table.set_index('AREA'), on='Province')
 
-local_df = place_table[place_table['CATEGORY'].isin(['HUC', 'ICC', 'Region'])]
-local_df = local_df.join(data_table.set_index('AREA'), on='ALT_LOCAL')
+city_df = place_table[place_table['CATEGORY'].isin(['HUC', 'ICC'])]
+city_df = city_df.join(data_table.set_index('AREA'), on='ALT_LOCAL')
+
+region_df = place_table[place_table['CATEGORY'] == 'Region']
+region_df = region_df.join(data_table.set_index('AREA'), on='ALT_LOCAL')
 
 place_table[data_table.columns] = np.nan
 place_table.update(prov_df)
-place_table.update(local_df)
+place_table.update(city_df)
+place_table.update(region_df)
 place_table.to_excel(outfilename)
 
-#   Get rows in data_table that match province names. Remove empty rows.
-#   Find ALT_LOCAL names that have matches with province names.
-#   Error checking. tukayo is disposable.
-#tukayo = data_table[data_table['ALT_LOCAL'].isin(prov_df['Province'])]
-#tukayo = tukayo[tukayo['ALT_LOCAL'].str.len() > 0]
-#tukayo = tukayo[tukayo['ALT_LOCAL'].isin(place_table['ALT_LOCAL'])]
-#data_table = data_table[~data_table['ALT_LOCAL'].isin(tukayo['ALT_LOCAL'])]
-
-#data_table.to_excel(outfilename)
+#   ----------
+#   ----------
+#   ----------

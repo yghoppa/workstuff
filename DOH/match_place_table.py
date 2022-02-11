@@ -6,13 +6,14 @@ import numpy as np
 #   one (1) table.
 
 #   Filename of pdf-to-excel file.
-datafilename = "datafile_input.xlsx"
-outfilename = "output.xlsx"
+datafilename = "Prenatal 3 p100.xlsx"
+outfilename = "OUT_" + datafilename
 
 #   Some place names from the FHSIS do not match the PCT table.
 #   Make dictionary/hash to automate name swap.
 rename_dict = {
     'COTABATO': 'COTABATO (NORTH COTABATO)',
+    'NORTH COTABATO': 'COTABATO (NORTH COTABATO)',
     'PROVINCE OF DINAGAT': 'DINAGAT ISLANDS',
     'NORTHERN LEYTE': 'LEYTE',
     'MT. PROVINCE': 'MOUNTAIN PROVINCE',
@@ -44,6 +45,7 @@ place_table['ALT_LOCAL'] = place_table['ALT_LOCAL'].str.upper()
 #   Removing blank rows. Replacing some names to match place_table names.
 data_table = pd.read_excel(datafilename, "Table 1")
 data_table = data_table[data_table['AREA'].str.len() > 0]
+data_table['AREA'] = data_table['AREA'].str.upper()
 data_table.replace(rename_dict, inplace=True)
 
 #   Cannot immediately match data_table to place_table because

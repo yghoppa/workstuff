@@ -6,7 +6,7 @@ import numpy as np
 #   one (1) table.
 
 #   Filename of pdf-to-excel file.
-datafilename = "Prenatal 3 p100.xlsx"
+datafilename = "Natality 1 p893.xlsx"
 outfilename = "OUT_" + datafilename
 
 #   Some place names from the FHSIS do not match the PCT table.
@@ -19,7 +19,22 @@ rename_dict = {
     'MT. PROVINCE': 'MOUNTAIN PROVINCE',
     'MINDORO OCCIDENTAL': 'OCCIDENTAL MINDORO',
     'MINDORO ORIENTAL': 'ORIENTAL MINDORO',
-    'WESTERN SAMAR': 'SAMAR (WESTERN SAMAR)'
+    'WESTERN SAMAR': 'SAMAR (WESTERN SAMAR)',
+    'N C R': 'METRO MANILA',
+    'C A R': 'CAR',
+    'REGION 1': 'ILOCOS',
+    'REGION 2': 'CAGAYAN VALLEY',
+    'REGION 3': 'CENTRAL LUZON',
+    'REGION 4A': 'CALABARZON',
+    'REGION 4B': 'MIMAROPA',
+    'REGION 5': 'BICOL',
+    'REGION 6': 'WESTERN VISAYAS',
+    'REGION 7': 'CENTRAL VISAYAS',
+    'REGION 8': 'EASTERN VISAYAS',
+    'REGION 9': 'ZAMBOANGA PENINSULA',
+    'REGION 10': 'NORTHERN MINDANAO',
+    'REGION 11': 'DAVAO',
+    'REGION 12': 'SOCCSARGEN'
 }
 
 #   Flag province names that have same name as local name.
@@ -47,6 +62,7 @@ data_table = pd.read_excel(datafilename, "Table 1")
 data_table = data_table[data_table['AREA'].str.len() > 0]
 data_table['AREA'] = data_table['AREA'].str.upper()
 data_table.replace(rename_dict, inplace=True)
+data_table.to_excel('OUT_data table.xlsx')
 
 #   Cannot immediately match data_table to place_table because
 #   province names repeat. Pick out province rows in place_table

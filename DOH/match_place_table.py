@@ -6,15 +6,9 @@ import numpy as np
 #   one (1) table.
 
 #   Filename of pdf-to-excel file.
-<<<<<<< HEAD
-datafilename = "Family Plan 3-5 p42-82.xlsx"
-outfilename = "OUT_K_" + datafilename
-data_worksheet = "Table 11"
-=======
 datafilename = "Immunization 1-6 p273-292.xlsx"
 outfilename = "OUT_F_" + datafilename
 data_sheetname = "Table 6"
->>>>>>> f3a90bd47242b144a52c609966ba19b434f36645
 
 #   Some place names from the FHSIS do not match the PCT table.
 #   Make dictionary/hash to automate name swap.
@@ -65,11 +59,7 @@ place_table['ALT_LOCAL'] = place_table['ALT_LOCAL'].str.upper()
 
 #   Loading entire data file (pdf-to-excel file of FHSIS) into a DataFrame.
 #   Removing blank rows. Replacing some names to match place_table names.
-<<<<<<< HEAD
-data_table = pd.read_excel(datafilename, data_worksheet)
-=======
 data_table = pd.read_excel(datafilename, data_sheetname)
->>>>>>> f3a90bd47242b144a52c609966ba19b434f36645
 data_table = data_table[data_table['AREA'].str.len() > 0]
 data_table['AREA'] = data_table['AREA'].str.upper()
 data_table.replace(rename_dict, inplace=True)

@@ -6,9 +6,9 @@ import numpy as np
 #   one (1) table.
 
 #   Filename of pdf-to-excel file.
-datafilename = "Immunization 1-6 p273-292.xlsx"
-outfilename = "OUT_F_" + datafilename
-data_sheetname = "Table 6"
+datafilename = "Deworm 1 p337.xlsx"
+outfilename = "OUT_" + datafilename
+data_sheetname = "Table 1"
 
 #   Some place names from the FHSIS do not match the PCT table.
 #   Make dictionary/hash to automate name swap.
@@ -22,6 +22,7 @@ rename_dict = {
     'MINDORO ORIENTAL': 'ORIENTAL MINDORO',
     'WESTERN SAMAR': 'SAMAR (WESTERN SAMAR)',
     'N C R': 'METRO MANILA',
+    'NCR': 'METRO MANILA',
     'C A R': 'CAR',
     'REGION 1': 'ILOCOS',
     'REGION 2': 'CAGAYAN VALLEY',

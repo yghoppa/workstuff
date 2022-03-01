@@ -1,39 +1,43 @@
 import pandas as pd
-import numpy as np
-from openpyxl import load_workbook
-
-def vertical_merge(datafile_ref, sheetlist):    
-    df_list = pd.read_excel(datafile_ref, sheetlist, header=None)
-
-    df_dest = pd.concat(df_list)
-
-    df_dest.to_excel(datafile_ref, sheetlist[0], header=False, index=False)
-
-    del sheetlist[0]
-    for sheet in sheetlist:
-        del datafile_ref.book[sheet]
-
-
-def horizontal_merge(datafile_ref, sheetlist):
-    df_list = pd.read_excel(datafile_ref, sheetlist, header=None)
-
-    df_dest = pd.concat(df_list, axis=1)
-
-    df_dest.to_excel(datafile_ref, sheetlist[0], header=False, index=False)
-
-    del sheetlist[0]
-    for sheet in sheetlist:
-        del datafile_ref.book[sheet]
-
+import numpy as np 
 
 datafile = "Morbidity 1-42.xlsx"
-destsheet = "Non-Neonatal Tetanus"
-nextsheet = "Table 109"
+outfile = "OUTPUT_Morbid.xlsx"
 
-datafile_ref = pd.ExcelWriter(datafile, mode='a', if_sheet_exists='replace')
+print("Running merge...")
 
-vertical_merge(datafile_ref, [destsheet, "Table 107", "Table 108"])
-vertical_merge(datafile_ref, [nextsheet, "Table 110", "Table 111"])
-horizontal_merge(datafile_ref, [destsheet, nextsheet])
+lookup_df = pd.read_excel("lookuptable.xlsx", "Sheet1")
+data_ref = pd.ExcelFile(datafile)
+alldata_df = pd.read_excel(data_ref, data_ref.sheet_names, header=None)
 
-datafile_ref.close()
+print("Finished loading excel files...")
+
+for row in lookup_df.itertuples(index=False):
+    print(row)
+
+    df_src = alldata_df[row.SOURCE]
+    df_dest = alldata_df[row.DEST]
+    
+    axis = 0
+    if row.DIRECTION == 'HORIZON':
+        axis = 1
+
+    df_temp = pd.concat([df_dest, df_src], axis=axis, ignore_index=True)
+
+    alldata_df[row.DEST] = df_temp
+
+    del alldata_df[row.SOURCE]
+
+out_ref = pd.ExcelWriter(outfile)
+
+for i, key in enumerate(alldata_df):
+    print("Writing " + key)
+    alldata_df[key].reset_index(drop=True, inplace=True)
+    alldata_df[key].loc[-1] = [key]*len(alldata_df[key].columns)
+    alldata_df[key].index = alldata_df[key].index + 1
+    alldata_df[key] = alldata_df[key].sort_index()
+    alldata_df[key].to_excel(out_ref, sheet_name=key, index=None, header=None)
+
+print("Saving...")
+out_ref.save()
+out_ref.close()

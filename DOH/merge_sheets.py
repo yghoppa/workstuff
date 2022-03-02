@@ -1,6 +1,10 @@
 import pandas as pd
 import numpy as np 
 
+#   Merges worksheets by naive concatenate (by row or column).
+#   Accomplish vertical merge first before horizontal merge
+#   because AREA column is deleted during horizontal merge.
+
 datafile = "Morbidity 1-42.xlsx"
 outfile = "OUTPUT_Morbid.xlsx"
 
@@ -20,6 +24,7 @@ for row in lookup_df.itertuples(index=False):
     
     axis = 0
     if row.DIRECTION == 'HORIZON':
+        df_src.drop([0], axis=1, inplace=True)
         axis = 1
 
     df_temp = pd.concat([df_dest, df_src], axis=axis, ignore_index=True)
